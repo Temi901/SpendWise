@@ -1,0 +1,19 @@
+# Virtual Environment
+venv/
+
+# Database
+db.sqlite3
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Static files collected
+staticfiles/
+
+# Environment variables
+.env
+
+# VS Code
+.vscode/

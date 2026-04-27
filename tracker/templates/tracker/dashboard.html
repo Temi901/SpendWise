@@ -1,0 +1,272 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpendWise Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+   <!-- Header -->
+<div class="header">
+    <h1>💰 SpendWise</h1>
+    <p>Your Personal Finance Tracker</p>
+    <div class="header-buttons">
+        <a href="{% url 'export_pdf' %}" class="btn-export">📤 Export PDF</a>
+        <button class="dark-mode-toggle" id="darkModeToggle">🌙 Dark Mode</button>
+    </div>
+</div>
+    <!-- Main Container -->
+    <div class="container">
+
+        <!-- Summary Cards -->
+        <div class="cards">
+            <div class="card balance">
+                <h3>Total Balance</h3>
+                <p>₦{{ balance }}</p>
+            </div>
+            <div class="card income">
+                <h3>Total Income</h3>
+                <p>₦{{ total_income }}</p>
+            </div>
+            <div class="card expense">
+                <h3>Total Expenses</h3>
+                <p>₦{{ total_expenses }}</p>
+            </div>
+        </div>
+        <!-- Charts Section -->
+<div class="charts">
+    <div class="chart-box">
+        <h2>Income vs Expenses</h2>
+        <canvas id="donutChart"></canvas>
+    </div>
+    <div class="chart-box">
+        <h2>Expenses by Category</h2>
+        <canvas id="barChart"></canvas>
+    </div>
+</div>
+    <!-- Budget Goals Section -->
+<div class="budget-section">
+    <h2>🎯 Budget Goals</h2>
+    
+    <!-- Add Budget Form -->
+    <form method="POST" action="{% url 'add_budget' %}">
+        {% csrf_token %}
+        <div class="budget-form">
+            <div class="form-group">
+                <label>Category</label>
+                {{ budget_form.category }}
+            </div>
+            <div class="form-group">
+                <label>Budget Amount</label>
+                {{ budget_form.amount }}
+            </div>
+            <div class="form-group">
+                <label>Month</label>
+                {{ budget_form.month }}
+            </div>
+            <button type="submit" class="btn-add">Add Budget</button>
+        </div>
+    </form>
+
+    <!-- Budget Progress Bars -->
+    {% if budget_data %}
+    <div class="budget-list">
+        {% for budget in budget_data %}
+        <div class="budget-item">
+            <div class="budget-header">
+                <span class="budget-category">{{ budget.category }}</span>
+                <span class="budget-amounts">
+                    ₦{{ budget.spent|floatformat:0 }} 
+                    of ₦{{ budget.budget|floatformat:0 }}
+                </span>
+                <a href="{% url 'delete_budget' budget.id %}"
+                   class="btn-delete"
+                   onclick="return confirm('Delete this budget?')">✕</a>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill 
+                    {% if budget.exceeded %}exceeded
+                    {% elif budget.warning %}warning
+                    {% else %}safe{% endif %}"
+                    style="width: {{ budget.percentage }}%">
+                </div>
+            </div>
+            <small>
+                {% if budget.exceeded %}
+                    ❌ Budget exceeded!
+                {% elif budget.warning %}
+                    ⚠️ Almost at limit!
+                {% else %}
+                    ✅ On track
+                {% endif %}
+            </small>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="no-budget">No budget goals set yet. Add one above!</p>
+    {% endif %}
+</div>
+        <!-- Add Transaction Form -->
+        <div class="form-section">
+            <h2>Add Transaction</h2>
+            <form method="POST" action="{% url 'add_transaction' %}">
+                {% csrf_token %}
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Title</label>
+                        {{ form.title }}
+                    </div>
+                    <div class="form-group">
+                        <label>Amount</label>
+                        {{ form.amount }}
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        {{ form.category }}
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        {{ form.transaction_type }}
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        {{ form.date }}
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        {{ form.notes }}
+                    </div>
+                </div>
+                <button type="submit" class="btn-add">Add Transaction</button>
+            </form>
+        </div>
+
+        <!-- Transactions Table -->
+        <div class="table-section">
+            <h2>Recent Transactions</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Amount</th>
+                        <th>Category</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ transaction.title }}</td>
+                        <td>₦{{ transaction.amount }}</td>
+                        <td>{{ transaction.category }}</td>
+                        <td>
+                            <span class="badge {{ transaction.transaction_type }}">
+                                {{ transaction.transaction_type }}
+                            </span>
+                        </td>
+                        <td>{{ transaction.date }}</td>
+                        <td>
+    <a href="{% url 'edit_transaction' transaction.pk %}" 
+       class="btn-edit">
+        Edit
+    </a>
+    <a href="{% url 'delete_transaction' transaction.pk %}" 
+       class="btn-delete"
+       onclick="return confirm('Are you sure you want to delete this?')">
+        Delete
+    </a>
+</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+    <!-- Chart.js Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<script>
+    // Dark Mode Toggle
+const toggle = document.getElementById('darkModeToggle');
+
+// Check saved preference
+if (localStorage.getItem('darkMode') === 'enabled') {
+    document.body.classList.add('dark-mode');
+    toggle.textContent = '☀️ Light Mode';
+}
+
+// Toggle dark mode
+toggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    if (document.body.classList.contains('dark-mode')) {
+        localStorage.setItem('darkMode', 'enabled');
+        toggle.textContent = '☀️ Light Mode';
+    } else {
+        localStorage.setItem('darkMode', 'disabled');
+        toggle.textContent = '🌙 Dark Mode';
+    }
+});
+    // Data from Django
+    const totalIncome = {{ total_income }};
+    const totalExpenses = {{ total_expenses }};
+    const categoryLabels = {{ category_labels|safe }};
+    const categoryData = {{ category_data|safe }};
+
+    // Donut Chart — Income vs Expenses
+    const donutCtx = document.getElementById('donutChart').getContext('2d');
+    new Chart(donutCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Income', 'Expenses'],
+            datasets: [{
+                data: [totalIncome, totalExpenses],
+                backgroundColor: ['#28a745', '#dc3545'],
+                borderWidth: 0,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+
+    // Bar Chart — Expenses by Category
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: categoryLabels,
+            datasets: [{
+                label: 'Amount (₦)',
+                data: categoryData,
+                backgroundColor: '#1a1a2e',
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

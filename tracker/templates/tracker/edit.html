@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Transaction - SpendWise</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>💰 SpendWise</h1>
+        <p>Your Personal Finance Tracker</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="form-section">
+            <h2>✏️ Edit Transaction</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Title</label>
+                        {{ form.title }}
+                    </div>
+                    <div class="form-group">
+                        <label>Amount</label>
+                        {{ form.amount }}
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        {{ form.category }}
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        {{ form.transaction_type }}
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        {{ form.date }}
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        {{ form.notes }}
+                    </div>
+                </div>
+                <div class="edit-buttons">
+                    <button type="submit" class="btn-add">Save Changes</button>
+                    <a href="{% url 'dashboard' %}" class="btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
