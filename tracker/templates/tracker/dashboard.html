@@ -9,10 +9,12 @@
 </head>
 <body>
    <!-- Header -->
+<!-- Header -->
 <div class="header">
     <h1>💰 SpendWise</h1>
     <p>Your Personal Finance Tracker</p>
     <div class="header-buttons">
+        <a href="{% url 'import_csv' %}" class="btn-import">📂 Import CSV</a>
         <a href="{% url 'export_pdf' %}" class="btn-export">📤 Export PDF</a>
         <button class="dark-mode-toggle" id="darkModeToggle">🌙 Dark Mode</button>
     </div>

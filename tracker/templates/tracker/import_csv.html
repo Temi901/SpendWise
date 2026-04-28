@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import CSV - SpendWise</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>💰 SpendWise</h1>
+        <p>Your Personal Finance Tracker</p>
+        <div class="header-buttons">
+            <a href="{% url 'dashboard' %}" class="btn-export">⬅️ Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="form-section">
+            <h2>📂 Import Transactions from CSV</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">
+                Upload a CSV file from your bank to automatically import transactions
+            </p>
+
+            <!-- Success Message -->
+            {% if success %}
+            <div class="alert-success">
+                ✅ {{ success }}
+                {% if errors %}<br>⚠️ {{ errors }}{% endif %}
+                <br><br>
+                <a href="{% url 'dashboard' %}" class="btn-add" 
+                   style="text-decoration:none; display:inline-block;">
+                   View Dashboard
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- Error Message -->
+            {% if error %}
+            <div class="alert">❌ {{ error }}</div>
+            {% endif %}
+
+            <!-- Upload Form -->
+            {% if not success %}
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="upload-area">
+                    <p>📄 Select your CSV file</p>
+                    <input type="file" name="csv_file" accept=".csv" class="file-input">
+                </div>
+                <button type="submit" class="btn-add" style="margin-top: 20px;">
+                    📤 Import Transactions
+                </button>
+            </form>
+            {% endif %}
+
+            <!-- CSV Format Guide -->
+            <div class="csv-guide">
+                <h3>📋 CSV Format Guide</h3>
+                <p>Your CSV file should have these columns:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Type</th>
+                            <th>Category</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2026-04-01</td>
+                            <td>Monthly Salary</td>
+                            <td>150000</td>
+                            <td>income</td>
+                            <td>Salary</td>
+                        </tr>
+                        <tr>
+                            <td>2026-04-02</td>
+                            <td>Shoprite</td>
+                            <td>15000</td>
+                            <td>expense</td>
+                            <td>Food</td>
+                        </tr>
+                        <tr>
+                            <td>2026-04-03</td>
+                            <td>Uber ride</td>
+                            <td>3500</td>
+                            <td>expense</td>
+                            <td>Transport</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="margin-top: 12px; color: var(--text-muted); font-size: 13px;">
+                    ⚠️ Date format: YYYY-MM-DD or DD/MM/YYYY<br>
+                    ⚠️ Type must be: income or expense<br>
+                    ⚠️ Valid categories: Food, Transport, Housing, Healthcare, 
+                    Education, Entertainment, Clothing, Utilities, 
+                    Savings, Salary, Freelance, Business, Other
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

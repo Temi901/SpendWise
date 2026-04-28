@@ -29,6 +29,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['spendwise2026.pythonanywhere.com', 'localhost', '127.0.0.1']
 
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
 # Application definition
 
