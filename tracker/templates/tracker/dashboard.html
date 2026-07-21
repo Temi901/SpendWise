@@ -13,9 +13,11 @@
 <div class="header">
     <h1>💰 SpendWise</h1>
     <p>Your Personal Finance Tracker</p>
+    <p style="opacity:0.8; font-size:14px;">Welcome, {{ user.username }} 👋</p>
     <div class="header-buttons">
         <a href="{% url 'import_csv' %}" class="btn-import">📂 Import CSV</a>
         <a href="{% url 'export_pdf' %}" class="btn-export">📤 Export PDF</a>
+        <a href="{% url 'logout' %}" class="btn-export">🚪 Logout</a>
         <button class="dark-mode-toggle" id="darkModeToggle">🌙 Dark Mode</button>
     </div>
 </div>
