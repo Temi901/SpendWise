@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - SpendWise</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-box">
+            <h1>💰 SpendWise</h1>
+            <h2>My Profile</h2>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="auth-subtitle">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Joined:</strong> {{ user.date_joined|date:"F j, Y" }}</p>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" value="{{ user.email }}" class="form-input" required>
+                </div>
+                <button type="submit" class="btn-add">Save Changes</button>
+            </form>
+
+            <p class="auth-link">
+                <a href="{% url 'password_change' %}">Change Password</a> |
+                <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
