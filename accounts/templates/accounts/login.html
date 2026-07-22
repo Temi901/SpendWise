@@ -34,7 +34,10 @@
                 <button type="submit" class="btn-add">Login</button>
             </form>
             <div class="form-group">
-
+    <p style="text-align:right; margin-top:5px;">
+        <a href="{% url 'password_reset' %}" style="font-size:13px;">Forgot password?</a>
+    </p>
+</div>
             <p class="auth-link">
                 Don't have an account? 
                 <a href="{% url 'register' %}">Register here</a>
